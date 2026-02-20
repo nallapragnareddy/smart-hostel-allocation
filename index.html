@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Hostel Room Allocation System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #ff512f, #dd2476);
+        }
+
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+        }
+
+        button {
+            padding: 10px;
+            margin-top: 10px;
+            width: 100%;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background: #f4f4f4;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .nav-btn {
+            margin-top: 15px;
+            background: gray;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- PAGE 1 -->
+<div id="page1" class="page" style="display:block;">
+    <div class="container">
+        <h1>Smart Hostel Room Allocation System</h1>
+        <p style="text-align:center;">Manage and Allocate Hostel Rooms Smartly</p>
+        <button onclick="goToPage(2)">Add & View Rooms</button>
+        <button onclick="goToPage(3)">Search & Allocate Room</button>
+    </div>
+</div>
+
+<!-- PAGE 2 -->
+<div id="page2" class="page">
+    <div class="container">
+        <h2>Add Room</h2>
+
+        Room Number:
+        <input type="text" id="roomNo">
+
+        Capacity:
+        <input type="number" id="capacity">
+
+        Has AC:
+        <select id="hasAC">
+            <option value="">-- Select AC Option --</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+
+        Has Attached Washroom:
+        <select id="hasWashroom">
+            <option value="">-- Select Washroom Option --</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+
+        <button onclick="addRoom()">Add Room</button>
+
+        <h2>All Rooms</h2>
+        <table id="roomTable">
+            <tr>
+                <th>Room No</th>
+                <th>Capacity</th>
+                <th>AC</th>
+                <th>Washroom</th>
+            </tr>
+        </table>
+
+        <button class="nav-btn" onclick="goToPage(1)">Back to Home</button>
+    </div>
+</div>
+
+<!-- PAGE 3 -->
+<div id="page3" class="page">
+    <div class="container">
+        <h2>Search & Allocate Room</h2>
+
+        Number of Students:
+        <input type="number" id="students">
+
+        Needs AC:
+        <select id="needsAC">
+            <option value="">-- Select Option --</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+
+        Needs Washroom:
+        <select id="needsWashroom">
+            <option value="">-- Select Option --</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+
+        <button onclick="allocateRoom()">Allocate Room</button>
+
+        <div id="output"></div>
+
+        <button class="nav-btn" onclick="goToPage(1)">Back to Home</button>
+    </div>
+</div>
+
+<script>
+    let rooms = [];
+
+    function goToPage(pageNumber) {
+        document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+        document.getElementById("page" + pageNumber).style.display = "block";
+        displayRooms();
+        document.getElementById("output").innerHTML = "";
+    }
+
+    function addRoom() {
+        let roomNo = document.getElementById("roomNo").value;
+        let capacity = parseInt(document.getElementById("capacity").value);
+        let hasACValue = document.getElementById("hasAC").value;
+        let hasWashroomValue = document.getElementById("hasWashroom").value;
+
+        if (!roomNo || capacity <= 0 || hasACValue === "" || hasWashroomValue === "") {
+            alert("Please fill all room details");
+            return;
+        }
+
+        if (rooms.some(r => r.roomNo === roomNo)) {
+            alert("Room already exists");
+            return;
+        }
+
+        rooms.push({
+            roomNo,
+            capacity,
+            hasAC: hasACValue === "true",
+            hasWashroom: hasWashroomValue === "true"
+        });
+
+        displayRooms();
+
+        document.getElementById("roomNo").value = "";
+        document.getElementById("capacity").value = "";
+        document.getElementById("hasAC").value = "";
+        document.getElementById("hasWashroom").value = "";
+    }
+
+    function displayRooms() {
+        let table = document.getElementById("roomTable");
+
+        table.innerHTML = `
+            <tr>
+                <th>Room No</th>
+                <th>Capacity</th>
+                <th>AC</th>
+                <th>Washroom</th>
+            </tr>
+        `;
+
+        rooms.forEach(room => {
+            table.innerHTML += `
+                <tr>
+                    <td>${room.roomNo}</td>
+                    <td>${room.capacity}</td>
+                    <td>${room.hasAC ? "Yes" : "No"}</td>
+                    <td>${room.hasWashroom ? "Yes" : "No"}</td>
+                </tr>
+            `;
+        });
+    }
+
+    function allocateRoom() {
+        let students = parseInt(document.getElementById("students").value);
+        let needsACValue = document.getElementById("needsAC").value;
+        let needsWashroomValue = document.getElementById("needsWashroom").value;
+        let output = document.getElementById("output");
+
+        output.innerHTML = "";
+        output.className = "";
+
+        if (rooms.length === 0) {
+            output.className = "error";
+            output.innerHTML = "❌ No rooms added yet.";
+            return;
+        }
+
+        if (!students || students <= 0 || needsACValue === "" || needsWashroomValue === "") {
+            output.className = "error";
+            output.innerHTML = "❌ Please fill all fields.";
+            return;
+        }
+
+        let needsAC = needsACValue === "true";
+        let needsWashroom = needsWashroomValue === "true";
+
+        let suitableRooms = rooms.filter(room =>
+            room.capacity >= students &&
+            room.hasAC === needsAC &&
+            room.hasWashroom === needsWashroom
+        );
+
+        if (suitableRooms.length === 0) {
+            output.className = "error";
+            output.innerHTML = "❌ No room available";
+            return;
+        }
+
+        suitableRooms.sort((a, b) => a.capacity - b.capacity);
+
+        let allocated = suitableRooms[0];
+
+        output.className = "success";
+        output.innerHTML = `
+            ✅ Room Allocated Successfully! <br>
+            Room No: ${allocated.roomNo} <br>
+            Capacity: ${allocated.capacity}
+        `;
+    }
+</script>
+
+</body>
+</html>
